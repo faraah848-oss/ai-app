@@ -1,0 +1,15 @@
+{
+  "name": "learnix",
+  "version": "1.0.0",
+  "description": "A Full-Stack AI Learning Assistant App using MERN stack (MongoDB, Express, React, Node.js), styled with Tailwind CSS, and powered by Google Gemini AI.",
+  "scripts": {
+    "install-all": "npm install && npm install --prefix backend && npm install --prefix frontend",
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

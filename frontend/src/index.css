@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 min-h-screen font-sans antialiased selection:bg-emerald-100 selection:text-emerald-900;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .btn-primary {
+    @apply relative h-12 px-6 bg-emerald-500 text-white text-sm font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2;
+  }
+
+  .btn-secondary {
+    @apply h-12 px-6 bg-white border border-slate-200 rounded-xl text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-all duration-200;
+  }
+
+  .input-field {
+    @apply w-full h-12 px-4 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 placeholder:text-slate-400 text-sm font-medium transition-all focus:outline-none focus:border-emerald-500;
+  }
+
+  .nav-link {
+    @apply text-slate-600 hover:text-emerald-600 transition-all flex items-center gap-2 font-medium text-sm;
+  }
+
+  .radial-bg {
+    @apply fixed inset-0 opacity-30 pointer-events-none;
+    background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+}
