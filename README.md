@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Learnix - AI Learning Assistant
 
 A Full-Stack AI Learning Assistant App using MERN stack (MongoDB, Express, React, Node.js), styled with Tailwind CSS, and powered by Google Gemini AI.
@@ -165,3 +166,6 @@ learnix/
 ## License
 
 MIT
+=======
+# ai-app
+>>>>>>> 780c0e155ffb9ace5e8c2bfee8e4b9243bf01b4f
