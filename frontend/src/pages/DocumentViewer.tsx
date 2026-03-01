@@ -9,17 +9,14 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
 // Configure PDF worker
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    'pdfjs-dist/build/pdf.worker.min.js',
-    import.meta.url,
-).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 export default function DocumentViewer() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [document, setDocument] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'chat' | 'summary' | 'explain'>('chat');
+    const [activeTab, setActiveTab] = useState<'chat' | 'summary' | 'explain' | 'notes'>('chat');
 
     // PDF State
     const [numPages, setNumPages] = useState<number | null>(null);
@@ -43,9 +40,46 @@ export default function DocumentViewer() {
     const [explanation, setExplanation] = useState('');
     const [explainLoading, setExplainLoading] = useState(false);
 
+    // Notes state
+    const [notes, setNotes] = useState<any[]>([]);
+    const [noteContent, setNoteContent] = useState('');
+    const [notesLoading, setNotesLoading] = useState(false);
+    const [noteSummary, setNoteSummary] = useState('');
+    const [noteSummaryLoading, setNoteSummaryLoading] = useState(false);
+
+    // AI Model Status
+    const [aiStatus, setAiStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+
     useEffect(() => {
         fetchDocument();
+        fetchNotes();
+        checkAIStatus();
     }, [id]);
+
+    const checkAIStatus = async () => {
+        try {
+            const response = await api.get('/debug/ai-status');
+            setAiStatus(response.data.status);
+            // If still loading, check again in 10 seconds
+            if (response.data.status === 'loading') {
+                setTimeout(checkAIStatus, 10000);
+            }
+        } catch (error) {
+            console.warn('AI status check failed');
+        }
+    };
+
+    const fetchNotes = async () => {
+        setNotesLoading(true);
+        try {
+            const response = await api.get(`/notes/document/${id}`);
+            setNotes(response.data);
+        } catch (error) {
+            console.error('Failed to fetch notes:', error);
+        } finally {
+            setNotesLoading(false);
+        }
+    };
 
     const fetchDocument = async () => {
         try {
@@ -148,6 +182,52 @@ export default function DocumentViewer() {
         }
     };
 
+    const handleAddNote = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!noteContent.trim()) return;
+
+        try {
+            const response = await api.post('/notes', {
+                documentId: id,
+                content: noteContent,
+                pageNumber
+            });
+            setNotes([response.data, ...notes]);
+            setNoteContent('');
+            toast.success('Note saved!');
+        } catch (error: any) {
+            console.error('Failed to save note:', error);
+            const message = error.response?.data?.message || error.response?.data?.error || 'Failed to save note';
+            toast.error(message);
+        }
+    };
+
+    const handleDeleteNote = async (noteId: string) => {
+        try {
+            await api.delete(`/notes/${noteId}`);
+            setNotes(notes.filter(n => n._id !== noteId));
+            toast.success('Note removed');
+        } catch (error: any) {
+            toast.error('Failed to delete note');
+        }
+    };
+
+    const handleSummarizeNotes = async () => {
+        if (notes.length === 0) return toast.error('Add some notes first!');
+
+        setNoteSummaryLoading(true);
+        const toastId = toast.loading('Summarizing your notes...');
+        try {
+            const response = await api.post('/notes/summarize', { documentId: id });
+            setNoteSummary(response.data.summary);
+            toast.success('Notes summarized!', { id: toastId });
+        } catch (error: any) {
+            toast.error('Failed to summarize notes', { id: toastId });
+        } finally {
+            setNoteSummaryLoading(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -225,7 +305,7 @@ export default function DocumentViewer() {
                             <div className="flex-1 flex flex-col items-center p-8 overflow-y-auto custom-scrollbar">
                                 {document && (
                                     <Document
-                                        file={`http://localhost:5000/uploads/${document.filename}`}
+                                        file={`/uploads/${document.filename}`}
                                         onLoadSuccess={onDocumentLoadSuccess}
                                         loading={
                                             <div className="flex flex-col items-center gap-4 py-20">
@@ -259,13 +339,33 @@ export default function DocumentViewer() {
                     {/* AI Assistant Sidebar */}
                     <div className="lg:col-span-4 sticky top-28 h-fit">
                         <div className="glass-card p-0 overflow-hidden border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col h-[750px]">
+                            {/* AI Model Status Banner */}
+                            {aiStatus === 'loading' && (
+                                <div className="bg-emerald-500 text-white px-4 py-2 flex items-center gap-3 animate-pulse">
+                                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest">Local AI Model Downloading... (~700MB)</span>
+                                </div>
+                            )}
+                            {aiStatus === 'error' && (
+                                <div className="bg-amber-500 text-white px-4 py-2 flex items-center gap-3">
+                                    <Info className="w-3 h-3" />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest">Using Fast Heuristics (Model failed to load)</span>
+                                </div>
+                            )}
+                            {aiStatus === 'ready' && (
+                                <div className="bg-emerald-50 text-emerald-600 px-4 py-1.5 flex items-center gap-2 border-b border-emerald-100">
+                                    <Sparkles className="w-3 h-3" />
+                                    <span className="text-[9px] font-bold uppercase tracking-widest">Local AI Brain: Ready</span>
+                                </div>
+                            )}
+
                             {/* Tabs */}
                             <div className="flex border-b border-slate-100 p-1 bg-slate-50/30">
-                                {['chat', 'summary', 'explain'].map((tab) => (
+                                {['chat', 'summary', 'explain', 'notes'].map((tab) => (
                                     <button
                                         key={tab}
                                         onClick={() => setActiveTab(tab as any)}
-                                        className={`flex-1 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all ${activeTab === tab
+                                        className={`flex-1 py-1.5 text-[9px] font-bold uppercase tracking-tight rounded-xl transition-all ${activeTab === tab
                                             ? 'bg-white text-emerald-600 shadow-sm'
                                             : 'text-slate-400 hover:text-slate-600'
                                             }`}
@@ -395,6 +495,90 @@ export default function DocumentViewer() {
                                                     <BrainCircuit className="w-10 h-10 mb-4" />
                                                     <p className="text-[10px] font-bold uppercase tracking-widest">Search a concept above</p>
                                                 </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'notes' && (
+                                    <div className="flex-1 flex flex-col overflow-hidden">
+                                        <form onSubmit={handleAddNote} className="mb-6 space-y-3">
+                                            <div className="flex items-center justify-between px-1">
+                                                <div className="flex items-center gap-2 text-slate-500">
+                                                    <BookOpen className="w-4 h-4" />
+                                                    <span className="text-[10px] font-bold uppercase tracking-widest">Page {pageNumber} Notes</span>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleSummarizeNotes}
+                                                    disabled={noteSummaryLoading || notes.length === 0}
+                                                    className="text-[9px] font-bold text-emerald-600 hover:text-emerald-700 uppercase"
+                                                >
+                                                    Summarize All
+                                                </button>
+                                            </div>
+                                            <div className="relative">
+                                                <textarea
+                                                    value={noteContent}
+                                                    onChange={(e) => setNoteContent(e.target.value)}
+                                                    placeholder="Add a thought for this page..."
+                                                    className="w-full h-24 p-4 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-emerald-500 transition-all font-medium resize-none shadow-sm"
+                                                    disabled={notesLoading}
+                                                />
+                                                <button
+                                                    type="submit"
+                                                    className="absolute right-2 bottom-2 w-8 h-8 bg-slate-900 text-white rounded-lg flex items-center justify-center hover:bg-slate-800 transition-colors disabled:opacity-30"
+                                                    disabled={notesLoading || !noteContent.trim()}
+                                                >
+                                                    <Send className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+                                        </form>
+
+                                        <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pb-4">
+                                            {noteSummary && (
+                                                <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl mb-4 relative group">
+                                                    <div className="flex items-center gap-2 text-emerald-700 mb-2">
+                                                        <Sparkles className="w-3.5 h-3.5" />
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider">Note Summary</span>
+                                                    </div>
+                                                    <p className="text-xs text-emerald-800 leading-relaxed font-medium">{noteSummary}</p>
+                                                    <button
+                                                        onClick={() => setNoteSummary('')}
+                                                        className="absolute top-2 right-2 text-emerald-400 hover:text-emerald-600"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {notes.length === 0 ? (
+                                                <div className="flex-1 flex flex-col items-center justify-center text-center opacity-40 py-10">
+                                                    <Layout className="w-10 h-10 mb-4" />
+                                                    <p className="text-[10px] font-bold uppercase tracking-widest">No notes yet</p>
+                                                </div>
+                                            ) : (
+                                                notes.map((note: any) => (
+                                                    <div
+                                                        key={note._id}
+                                                        className="group bg-white border border-slate-100 p-4 rounded-2xl shadow-sm hover:border-slate-200 transition-all"
+                                                    >
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-2 py-0.5 bg-slate-50 rounded-md">
+                                                                Page {note.pageNumber}
+                                                            </span>
+                                                            <button
+                                                                onClick={() => handleDeleteNote(note._id)}
+                                                                className="text-slate-300 hover:text-red-500 transition-colors p-1"
+                                                            >
+                                                                <Info className="w-3.5 h-3.5" />
+                                                            </button>
+                                                        </div>
+                                                        <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                                                            {note.content}
+                                                        </p>
+                                                    </div>
+                                                ))
                                             )}
                                         </div>
                                     </div>

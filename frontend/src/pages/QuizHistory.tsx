@@ -77,7 +77,7 @@ export default function QuizHistory() {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {quizzes.map((quiz) => {
-                            const percentage = Math.round((quiz.score / quiz.totalQuestions) * 100);
+                            const percentage = quiz.totalQuestions > 0 ? Math.round((quiz.score / quiz.totalQuestions) * 100) : 0;
                             const scoreColor = percentage >= 80 ? 'emerald' : percentage >= 60 ? 'yellow' : 'red';
 
                             return (
@@ -106,11 +106,11 @@ export default function QuizHistory() {
                                                 className={`h-full bg-gradient-to-r from-${scoreColor}-500 to-${scoreColor}-400`}
                                                 style={{
                                                     width: `${percentage}%`,
-                                                    background: scoreColor === 'emerald' 
+                                                    background: scoreColor === 'emerald'
                                                         ? 'linear-gradient(to right, rgb(16, 185, 129), rgb(52, 211, 153))'
                                                         : scoreColor === 'yellow'
-                                                        ? 'linear-gradient(to right, rgb(217, 119, 6), rgb(251, 146, 60))'
-                                                        : 'linear-gradient(to right, rgb(239, 68, 68), rgb(248, 113, 113))'
+                                                            ? 'linear-gradient(to right, rgb(217, 119, 6), rgb(251, 146, 60))'
+                                                            : 'linear-gradient(to right, rgb(239, 68, 68), rgb(248, 113, 113))'
                                                 }}
                                             />
                                         </div>
@@ -173,9 +173,9 @@ export default function QuizHistory() {
                                 <h3 className="text-sm font-semibold text-slate-900">Average Score</h3>
                             </div>
                             <p className="text-3xl font-bold text-amber-600">
-                                {Math.round(
-                                    quizzes.reduce((sum, q) => sum + (q.score / q.totalQuestions) * 100, 0) / quizzes.length
-                                )}%
+                                {quizzes.length > 0
+                                    ? Math.round(quizzes.reduce((sum, q) => sum + (q.totalQuestions > 0 ? (q.score / q.totalQuestions) * 100 : 0), 0) / quizzes.length)
+                                    : 0}%
                             </p>
                         </div>
 

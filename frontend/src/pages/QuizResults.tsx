@@ -50,7 +50,7 @@ export default function QuizResults() {
         );
     }
 
-    const percentage = Math.round((quiz.score / quiz.totalQuestions) * 100);
+    const percentage = quiz.totalQuestions > 0 ? Math.round((quiz.score / quiz.totalQuestions) * 100) : 0;
 
     return (
         <div className="space-y-10">

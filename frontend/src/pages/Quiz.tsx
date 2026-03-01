@@ -79,7 +79,35 @@ export default function Quiz() {
         );
     }
 
+    if (!quiz || !quiz.questions || quiz.questions.length === 0) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
+                <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mb-6">
+                    <HelpCircle className="w-8 h-8 text-amber-500" />
+                </div>
+                <h2 className="text-xl font-bold text-slate-800 mb-2">Quiz Empty</h2>
+                <p className="text-slate-500 mb-8 max-w-sm">We couldn't generate questions for this document. Try with a different or longer document.</p>
+                <button
+                    onClick={() => navigate('/documents')}
+                    className="btn-primary px-8 h-12"
+                >
+                    Back to Documents
+                </button>
+            </div>
+        );
+    }
+
     const question = quiz.questions[currentQuestion];
+
+    if (!question) {
+        return (
+            <div className="text-center py-20">
+                <p className="text-slate-500">Error: Question not found at index {currentQuestion}</p>
+                <button onClick={() => setCurrentQuestion(0)} className="mt-4 text-emerald-600 font-bold">Restart Quiz</button>
+            </div>
+        );
+    }
+
     const progress = ((currentQuestion + 1) / quiz.questions.length) * 100;
 
     return (
