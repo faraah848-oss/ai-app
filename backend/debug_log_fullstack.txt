@@ -1,0 +1,4 @@
+🤖 AI service: Initializing local Transformers model (LaMini-Flan-T5-783M)...
+NODE_OPTIONS: --openssl-legacy-provider
+✅ Server is running on http://127.0.0.1:5000
+✅ MongoDB connected successfully

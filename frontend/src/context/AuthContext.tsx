@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const fetchUserProfile = async () => {
             const savedUser = localStorage.getItem('user');
             const savedToken = localStorage.getItem('token');
-            
+
             if (savedToken && !savedUser) {
                 // Token exists but user data is missing, fetch from database
                 try {
@@ -44,10 +44,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     localStorage.setItem('user', JSON.stringify(fetchedUser));
                 } catch (error) {
                     console.error('Failed to fetch user profile:', error);
-                    // Clear invalid token if profile fetch fails
+                    // Clear invalid token/user if profile fetch fails
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
                     setToken(null);
+                    setUser(null);
                 }
             } else if (savedUser && savedToken) {
                 setUser(JSON.parse(savedUser));

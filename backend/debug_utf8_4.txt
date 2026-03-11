@@ -1,0 +1,126 @@
+﻿≡ƒñû AI service: Initializing local Transformers model (LaMini-Flan-T5-783M)...
+Γ£à Server is running on http://127.0.0.1:5000
+Γ£à MongoDB connected via common/lib/mongodb.js
+node : Registration 
+error: MongooseError: 
+Operation 
+`users.findOne()` 
+buffering timed out 
+after 10000ms
+At line:1 char:1
++ node backend/local-se
+rver.js > 
+backend/debug_log.txt 
+2>&1
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (Registration    
+ er...t after 10000    
+ms:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+    at 
+Timeout._onTimeout (C:\
+Users\abdhu\OneDrive\Do
+cuments\learnix\fronten
+d\node_modules\mongoose
+\lib\drivers\node-mongo
+db-native\collection.js
+:131:25)
+    at listOnTimeout (n
+ode:internal/timers:605
+:17)
+    at 
+process.processTimers (
+node:internal/timers:54
+1:7)
+Registration error: 
+MongooseError: 
+Operation 
+`users.findOne()` 
+buffering timed out 
+after 10000ms
+    at 
+Timeout._onTimeout (C:\
+Users\abdhu\OneDrive\Do
+cuments\learnix\fronten
+d\node_modules\mongoose
+\lib\drivers\node-mongo
+db-native\collection.js
+:131:25)
+    at listOnTimeout (n
+ode:internal/timers:605
+:17)
+    at 
+process.processTimers (
+node:internal/timers:54
+1:7)
+Registration error: 
+MongooseError: 
+Operation 
+`users.findOne()` 
+buffering timed out 
+after 10000ms
+    at 
+Timeout._onTimeout (C:\
+Users\abdhu\OneDrive\Do
+cuments\learnix\fronten
+d\node_modules\mongoose
+\lib\drivers\node-mongo
+db-native\collection.js
+:131:25)
+    at listOnTimeout (n
+ode:internal/timers:605
+:17)
+    at 
+process.processTimers (
+node:internal/timers:54
+1:7)
+Registration error: 
+MongooseError: 
+Operation 
+`users.findOne()` 
+buffering timed out 
+after 10000ms
+    at 
+Timeout._onTimeout (C:\
+Users\abdhu\OneDrive\Do
+cuments\learnix\fronten
+d\node_modules\mongoose
+\lib\drivers\node-mongo
+db-native\collection.js
+:131:25)
+    at listOnTimeout (n
+ode:internal/timers:605
+:17)
+    at 
+process.processTimers (
+node:internal/timers:54
+1:7)
+Registration error: 
+MongooseError: 
+Operation 
+`users.findOne()` 
+buffering timed out 
+after 10000ms
+    at 
+Timeout._onTimeout (C:\
+Users\abdhu\OneDrive\Do
+cuments\learnix\fronten
+d\node_modules\mongoose
+\lib\drivers\node-mongo
+db-native\collection.js
+:131:25)
+    at listOnTimeout (n
+ode:internal/timers:605
+:17)
+    at 
+process.processTimers (
+node:internal/timers:54
+1:7)

@@ -177,7 +177,8 @@ export default function DocumentViewer() {
             toast.success('Quiz is ready!', { id: toastId });
             navigate(`/quiz/${response.data.quiz._id}`);
         } catch (error: any) {
-            const message = error.response?.data?.error || error.response?.data?.message || 'Quiz generation failed';
+            console.error('Quiz generation error:', error);
+            const message = error.response?.data?.message || 'Quiz generation failed. Please try again or use a different document.';
             toast.error(message, { id: toastId });
         }
     };
@@ -305,7 +306,7 @@ export default function DocumentViewer() {
                             <div className="flex-1 flex flex-col items-center p-8 overflow-y-auto custom-scrollbar">
                                 {document && (
                                     <Document
-                                        file={`/uploads/${document.filename}`}
+                                        file={`${import.meta.env.VITE_API_BASE_URL || ''}/uploads/${document.filename}`}
                                         onLoadSuccess={onDocumentLoadSuccess}
                                         loading={
                                             <div className="flex flex-col items-center gap-4 py-20">

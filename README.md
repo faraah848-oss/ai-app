@@ -1,14 +1,13 @@
-<<<<<<< HEAD
 # Learnix - AI Learning Assistant
 
-A Full-Stack AI Learning Assistant App using MERN stack (MongoDB, Express, React, Node.js), styled with Tailwind CSS, and powered by Google Gemini AI.
+A Full-Stack AI Learning Assistant App using MERN stack (MongoDB, Express, React, Node.js), styled with Tailwind CSS, and powered by local Transformers AI.
 
 ## Features
 
 - **User Authentication** – Secure login & signup with JWT
 - **PDF Upload & Management** – Upload, store, and manage study documents
 - **Embedded PDF Viewer** – Read documents directly within the app
-- **AI-Powered Chat** – Ask questions about your documents with Google Gemini
+- **AI-Powered Chat** – Ask questions about your documents
 - **AI Document Summary** – Generate concise summaries
 - **AI Concept Explainer** – Get detailed explanations
 - **Auto-Generated Flashcards** – Create flashcard sets automatically
@@ -22,7 +21,6 @@ A Full-Stack AI Learning Assistant App using MERN stack (MongoDB, Express, React
 
 - Node.js (v18 or higher)
 - MongoDB (local or Atlas)
-- Google Gemini API Key
 
 ## Installation
 
@@ -43,7 +41,6 @@ Create a `.env` file in the `backend` directory:
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/learnix
 JWT_SECRET=your_jwt_secret_key_here_change_in_production
-GEMINI_API_KEY=your_google_gemini_api_key_here
 NODE_ENV=development
 ```
 
@@ -53,11 +50,6 @@ cd ../frontend
 npm install
 ```
 
-### 4. Get Google Gemini API Key
-
-1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Create a new API key
-3. Copy the key to your `.env` file
 
 ## Running the Application
 
@@ -121,7 +113,7 @@ learnix/
 - Express.js
 - MongoDB with Mongoose
 - JWT for authentication
-- Google Generative AI (Gemini)
+- Local LLMs via Transformers.js
 - Multer for file uploads
 - PDF-Parse for PDF text extraction
 
@@ -164,8 +156,4 @@ learnix/
 - `GET /api/progress` - Get user progress stats
 
 ## License
-
 MIT
-=======
-# ai-app
->>>>>>> 780c0e155ffb9ace5e8c2bfee8e4b9243bf01b4f

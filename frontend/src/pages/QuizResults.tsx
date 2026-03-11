@@ -50,6 +50,26 @@ export default function QuizResults() {
         );
     }
 
+    if (!quiz) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center text-center">
+                <div>
+                    <h2 className="text-xl font-semibold text-slate-800">Quiz data not found.</h2>
+                    <p className="text-slate-500 mt-2">
+                        Could not load the results for this quiz. It might have been deleted or there was an error.
+                    </p>
+                    <button
+                        onClick={() => navigate('/')}
+                        className="mt-6 h-10 px-6 bg-emerald-500 text-white rounded-lg text-sm font-semibold hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 mx-auto"
+                    >
+                        <Home className="w-4 h-4" />
+                        Go to Dashboard
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     const percentage = quiz.totalQuestions > 0 ? Math.round((quiz.score / quiz.totalQuestions) * 100) : 0;
 
     return (
@@ -122,8 +142,16 @@ export default function QuizResults() {
                                 Dashboard
                             </button>
                             <button
-                                onClick={() => navigate(`/documents/${quiz.documentId._id}`)}
-                                className="group relative h-12 px-8 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 overflow-hidden"
+                                onClick={() => {
+                                    const docId = typeof quiz.documentId === 'object' 
+                                        ? quiz.documentId?._id 
+                                        : quiz.documentId;
+                                    if (docId) {
+                                        navigate(`/documents/${docId}`);
+                                    }
+                                }}
+                                disabled={!quiz.documentId}
+                                className="group relative h-12 px-8 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <span className="relative z-10 flex items-center gap-2">
                                     <RefreshCw className="w-4 h-4" />
@@ -143,73 +171,75 @@ export default function QuizResults() {
                 </div>
 
                 {/* Analysis Breakdown */}
-                <div className="space-y-6">
-                    <div className="flex items-center gap-2 px-2 text-slate-500">
-                        <BarChart3 className="w-4 h-4" />
-                        <h2 className="text-[10px] font-bold uppercase tracking-[0.2em]">Detailed Item Analysis</h2>
-                    </div>
+                {quiz.questions && Array.isArray(quiz.questions) && quiz.userAnswers && Array.isArray(quiz.userAnswers) && (
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-2 px-2 text-slate-500">
+                            <BarChart3 className="w-4 h-4" />
+                            <h2 className="text-[10px] font-bold uppercase tracking-[0.2em]">Detailed Item Analysis</h2>
+                        </div>
 
-                    <div className="grid gap-6">
-                        {quiz.questions.map((question: any, idx: number) => {
-                            const userAnswer = quiz.userAnswers[idx];
-                            const isCorrect = userAnswer === question.correctAnswer;
+                        <div className="grid gap-6">
+                            {quiz.questions.map((question: any, idx: number) => {
+                                const userAnswer = quiz.userAnswers[idx];
+                                const isCorrect = userAnswer === question.correctAnswer;
 
-                            return (
-                                <div key={idx} className={`bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-3xl p-0 overflow-hidden shadow-lg shadow-slate-200/20 group hover:border-emerald-500/30 transition-all duration-300`}>
-                                    <div className={`px-6 py-4 border-b border-slate-100/60 flex items-center justify-between ${isCorrect ? 'bg-emerald-50/20' : 'bg-red-50/20'}`}>
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Question {idx + 1}</span>
-                                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
-                                                {isCorrect ? 'Correct' : 'Needs Review'}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div className="p-8 space-y-8">
-                                        <p className="text-lg font-medium text-slate-900 leading-snug">
-                                            {question.question}
-                                        </p>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                            {question.options.map((option: string, optIdx: number) => {
-                                                const isUserAnswer = optIdx === userAnswer;
-                                                const isCorrectAnswer = optIdx === question.correctAnswer;
-
-                                                return (
-                                                    <div
-                                                        key={optIdx}
-                                                        className={`p-4 rounded-xl border-2 text-sm font-medium flex items-center justify-between transition-all ${isCorrectAnswer
-                                                            ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm'
-                                                            : isUserAnswer
-                                                                ? 'bg-red-50 border-red-500 text-red-700 shadow-sm'
-                                                                : 'bg-white border-slate-100 text-slate-400'
-                                                            }`}
-                                                    >
-                                                        <span className="flex-1 pr-4">{option}</span>
-                                                        {isCorrectAnswer && <Check className="w-4 h-4 flex-shrink-0" strokeWidth={3} />}
-                                                        {isUserAnswer && !isCorrectAnswer && <X className="w-4 h-4 flex-shrink-0" strokeWidth={3} />}
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-
-                                        {question.explanation && (
-                                            <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-100 space-y-2 shadow-inner">
-                                                <div className="flex items-center gap-2 text-slate-500">
-                                                    <HelpCircle className="w-3.5 h-3.5" />
-                                                    <span className="text-[10px] font-bold uppercase tracking-widest">Academic Rationale</span>
-                                                </div>
-                                                <p className="text-xs text-slate-600 font-medium leading-relaxed italic">
-                                                    {question.explanation}
-                                                </p>
+                                return (
+                                    <div key={idx} className={`bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-3xl p-0 overflow-hidden shadow-lg shadow-slate-200/20 group hover:border-emerald-500/30 transition-all duration-300`}>
+                                        <div className={`px-6 py-4 border-b border-slate-100/60 flex items-center justify-between ${isCorrect ? 'bg-emerald-50/20' : 'bg-red-50/20'}`}>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Question {idx + 1}</span>
+                                                <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                                                    {isCorrect ? 'Correct' : 'Needs Review'}
+                                                </span>
                                             </div>
-                                        )}
+                                        </div>
+
+                                        <div className="p-8 space-y-8">
+                                            <p className="text-lg font-medium text-slate-900 leading-snug">
+                                                {question.question}
+                                            </p>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                {question.options.map((option: string, optIdx: number) => {
+                                                    const isUserAnswer = optIdx === userAnswer;
+                                                    const isCorrectAnswer = optIdx === question.correctAnswer;
+
+                                                    return (
+                                                        <div
+                                                            key={optIdx}
+                                                            className={`p-4 rounded-xl border-2 text-sm font-medium flex items-center justify-between transition-all ${isCorrectAnswer
+                                                                ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm'
+                                                                : isUserAnswer
+                                                                    ? 'bg-red-50 border-red-500 text-red-700 shadow-sm'
+                                                                    : 'bg-white border-slate-100 text-slate-400'
+                                                                }`}
+                                                        >
+                                                            <span className="flex-1 pr-4">{option}</span>
+                                                            {isCorrectAnswer && <Check className="w-4 h-4 flex-shrink-0" strokeWidth={3} />}
+                                                            {isUserAnswer && !isCorrectAnswer && <X className="w-4 h-4 flex-shrink-0" strokeWidth={3} />}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            {question.explanation && (
+                                                <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-100 space-y-2 shadow-inner">
+                                                    <div className="flex items-center gap-2 text-slate-500">
+                                                        <HelpCircle className="w-3.5 h-3.5" />
+                                                        <span className="text-[10px] font-bold uppercase tracking-widest">Academic Rationale</span>
+                                                    </div>
+                                                    <p className="text-xs text-slate-600 font-medium leading-relaxed italic">
+                                                        {question.explanation}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

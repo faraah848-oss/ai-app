@@ -29,4 +29,4 @@ const flashcardSchema = new mongoose.Schema({
     }
 });
 
-export default mongoose.model('Flashcard', flashcardSchema);
+export default mongoose.models.Flashcard || mongoose.model('Flashcard', flashcardSchema);

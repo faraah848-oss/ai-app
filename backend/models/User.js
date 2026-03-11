@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+import { scryptSync, randomBytes, timingSafeEqual } from 'crypto';
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -26,15 +26,39 @@ const userSchema = new mongoose.Schema({
 });
 
 // Hash password before saving
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
-    this.password = await bcrypt.hash(this.password, 10);
-    next();
+userSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
+    try {
+        const salt = randomBytes(16).toString('hex');
+        const hash = scryptSync(this.password, salt, 64).toString('hex');
+        this.password = `${salt}:${hash}`;
+    } catch (error) {
+        throw error;
+    }
 });
 
 // Compare password method
 userSchema.methods.comparePassword = async function (candidatePassword) {
-    return await bcrypt.compare(candidatePassword, this.password);
+    try {
+        const [salt, hash] = this.password.split(':');
+        if (!salt || !hash) return false;
+
+        const candidateHash = scryptSync(candidatePassword, salt, 64).toString('hex');
+
+        const bHash = Buffer.from(hash);
+        const bCandidateHash = Buffer.from(candidateHash);
+
+        if (bHash.length !== bCandidateHash.length) {
+            return false;
+        }
+
+        return timingSafeEqual(bHash, bCandidateHash);
+    } catch (error) {
+        console.error('Password comparison error:', error);
+        return false;
+    }
 };
 
-export default mongoose.model('User', userSchema);
+// Prevent model overwrite in serverless environments
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+export default User;

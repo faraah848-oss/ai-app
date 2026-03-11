@@ -59,7 +59,7 @@ export default function Flashcards() {
                 await api.delete(`/flashcards/${id}`);
                 const updatedFlashcards = flashcards.filter(fc => fc._id !== id);
                 setFlashcards(updatedFlashcards);
-                
+
                 if (updatedFlashcards.length === 0) {
                     if (documentId) {
                         navigate(`/documents/${documentId}`);
@@ -67,7 +67,7 @@ export default function Flashcards() {
                 } else if (currentIndex >= updatedFlashcards.length) {
                     setCurrentIndex(currentIndex - 1);
                 }
-                
+
                 toast.success('Flashcard deleted');
             } catch (error) {
                 toast.error('Failed to delete flashcard');
@@ -247,55 +247,81 @@ export default function Flashcards() {
                 </div>
 
                 {/* Flashcard Area */}
-                <div className="perspective-1000 relative group">
+                <div className="perspective-1000 relative group h-[500px]">
                     <div
                         onClick={() => setFlipped(!flipped)}
-                        className={`relative w-full min-h-[450px] cursor-pointer transition-all duration-700 preserve-3d shadow-2xl shadow-slate-200/50 rounded-[2.5rem] border border-slate-200/60 ${flipped ? 'rotate-y-180' : ''}`}
+                        className={`relative w-full h-full cursor-pointer transition-all duration-700 preserve-3d ${flipped ? 'rotate-y-180' : ''}`}
                     >
                         {/* Front */}
-                        <div className="absolute inset-0 backface-hidden bg-white/90 backdrop-blur-xl rounded-[2.5rem] p-12 flex flex-col items-center justify-center text-center">
-                            <div className="absolute top-8 right-8 flex items-center gap-2">
+                        <div className="absolute inset-0 backface-hidden cartoon-card overflow-hidden bg-[#FFEB3B] flex flex-col items-center justify-center text-center p-12">
+                            {/* Decorative elements */}
+                            <div className="absolute top-0 left-0 w-24 h-24 bg-white/20 rounded-full -translate-x-12 -translate-y-12" />
+                            <div className="absolute bottom-0 right-0 w-32 h-32 bg-slate-900/5 rounded-full translate-x-16 translate-y-16" />
+
+                            <div className="absolute top-8 right-8 flex items-center gap-3">
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         toggleFavorite(currentCard._id);
                                     }}
-                                    className="p-3 rounded-2xl bg-white border border-slate-100 hover:bg-emerald-50 text-slate-300 hover:text-emerald-500 transition-all active:scale-90 shadow-sm"
+                                    className="p-3 rounded-2xl bg-white cartoon-btn hover:bg-emerald-50 text-slate-400 hover:text-emerald-500 transition-all active:scale-90"
                                 >
-                                    <Star className={`w-6 h-6 ${currentCard.isFavorite ? 'fill-emerald-500 text-emerald-500' : ''}`} />
+                                    <Star className={`w-6 h-6 ${currentCard.isFavorite ? 'fill-emerald-500 text-emerald-500 shadow-none' : ''}`} />
                                 </button>
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         deleteFlashcard(currentCard._id);
                                     }}
-                                    className="p-3 rounded-2xl bg-white border border-slate-100 hover:bg-red-50 text-slate-300 hover:text-red-500 transition-all active:scale-90 shadow-sm"
+                                    className="p-3 rounded-2xl bg-white cartoon-btn hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all active:scale-90"
                                 >
                                     <Trash2 className="w-6 h-6" />
                                 </button>
                             </div>
 
-                            <div className="space-y-6">
-                                <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.2em] bg-emerald-50 px-3 py-1 rounded-full">Question</span>
-                                <p className="text-3xl font-semibold text-slate-900 leading-tight">
+                            <div className="relative space-y-8 z-10">
+                                <div className="inline-block px-4 py-1.5 bg-slate-900 text-white rounded-full text-xs font-black uppercase tracking-[0.2em]">
+                                    Question
+                                </div>
+                                <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-[1.1] max-w-2xl mx-auto">
                                     {currentCard.question}
-                                </p>
+                                </h2>
                             </div>
 
-                            <div className="absolute bottom-10 flex flex-col items-center gap-3 opacity-30 group-hover:opacity-60 transition-opacity">
-                                <RotateCw className="w-5 h-5 animate-spin-slow" />
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Tap to Reveal</span>
+                            <div className="absolute bottom-12 flex flex-col items-center gap-3 animate-bounce">
+                                <div className="w-10 h-10 rounded-full border-2 border-slate-900 flex items-center justify-center bg-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
+                                    <RotateCw className="w-5 h-5 text-slate-900" />
+                                </div>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">Click to flip</span>
                             </div>
                         </div>
 
                         {/* Back */}
-                        <div className="absolute inset-0 backface-hidden bg-slate-900 text-white rounded-[2.5rem] p-12 flex flex-col items-center justify-center text-center rotate-y-180">
-                            <div className="space-y-6">
-                                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] bg-white/10 px-3 py-1 rounded-full">Explanation</span>
-                                <p className="text-2xl font-medium leading-relaxed italic opacity-90">
-                                    {currentCard.answer}
-                                </p>
+                        <div className="absolute inset-0 backface-hidden cartoon-card bg-[#4CAF50] p-12 flex flex-col items-center justify-center text-center rotate-y-180 overflow-hidden">
+                            {/* Decorative elements */}
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full translate-x-12 -translate-y-12" />
+                            <div className="absolute bottom-0 left-0 w-32 h-32 bg-slate-900/10 rounded-full -translate-x-16 translate-y-16" />
+
+                            <div className="relative space-y-8 z-10">
+                                <div className="inline-block px-4 py-1.5 bg-white text-[#4CAF50] rounded-full text-xs font-black uppercase tracking-[0.2em] shadow-[4px_4px_0px_0px_rgba(15,23,42,0.2)]">
+                                    Answer
+                                </div>
+                                <div className="bg-white/90 cartoon-card p-8 md:p-10 shadow-[8px_8px_0px_0px_rgba(15,23,42,0.1)]">
+                                    <p className="text-2xl md:text-3xl font-bold text-slate-900 leading-relaxed">
+                                        {currentCard.answer}
+                                    </p>
+                                </div>
                             </div>
+
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setFlipped(false);
+                                }}
+                                className="absolute bottom-12 px-6 py-2 bg-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-widest cartoon-btn"
+                            >
+                                Back to question
+                            </button>
                         </div>
                     </div>
                 </div>

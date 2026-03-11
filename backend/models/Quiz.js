@@ -9,8 +9,18 @@ const quizSchema = new mongoose.Schema({
     documentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Document',
-        required: true
+        required: false
     },
+    documentIds: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Document',
+        required: false
+    }],
+    documentIds: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Document',
+        required: false
+    }],
     questions: [{
         question: String,
         options: [String],
@@ -38,4 +48,4 @@ const quizSchema = new mongoose.Schema({
     }
 });
 
-export default mongoose.model('Quiz', quizSchema);
+export default mongoose.models.Quiz || mongoose.model('Quiz', quizSchema);

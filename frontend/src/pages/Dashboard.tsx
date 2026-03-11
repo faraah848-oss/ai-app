@@ -126,7 +126,7 @@ export default function Dashboard() {
                                                     Accessed Document: <span className="text-slate-600 font-medium">{doc.title}</span>
                                                 </p>
                                                 <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-wider">
-                                                    {new Date(doc.uploadDate).toLocaleString()}
+                                                    {new Date(doc.uploadedAt).toLocaleString()}
                                                 </p>
                                             </div>
                                         </div>

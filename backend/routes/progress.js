@@ -1,56 +1,42 @@
 import express from 'express';
-import authenticateToken from '../middleware/auth.js';
 import Document from '../models/Document.js';
 import Flashcard from '../models/Flashcard.js';
 import Quiz from '../models/Quiz.js';
+import authenticateToken from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Get user progress dashboard
-router.get('/', authenticateToken, async (req, res) => {
+router.use(authenticateToken);
+
+router.get('/', async (req, res) => {
     try {
         const userId = req.user.userId;
 
-        // Get counts
-        const documentCount = await Document.countDocuments({ userId });
-        const flashcardCount = await Flashcard.countDocuments({ userId });
-        const quizCount = await Quiz.countDocuments({ userId, completedAt: { $ne: null } });
-
-        // Get recent activity
-        const recentDocuments = await Document.find({ userId }).sort({ uploadedAt: -1 }).limit(5);
-        const recentQuizzes = await Quiz.find({ userId, completedAt: { $ne: null } })
-            .populate('documentId', 'title')
-            .sort({ completedAt: -1 })
-            .limit(5);
-
-        // Calculate average quiz score
-        const completedQuizzes = await Quiz.find({ userId, score: { $ne: null } });
-        const avgScore = completedQuizzes.length > 0
-            ? completedQuizzes.reduce((sum, q) => sum + (q.score / q.totalQuestions) * 100, 0) / completedQuizzes.length
-            : 0;
+        // Fetch all stats concurrently for better performance
+        const [docCount, flashcardCount, quizCount, recentDocs] = await Promise.all([
+            Document.countDocuments({ userId }),
+            Flashcard.countDocuments({ userId }),
+            Quiz.countDocuments({ userId }),
+            Document.find({ userId }).sort({ uploadedAt: -1 }).limit(5)
+        ]);
 
         res.json({
             stats: {
-                documents: documentCount,
+                documents: docCount,
                 flashcards: flashcardCount,
-                quizzes: quizCount,
-                averageScore: Math.round(avgScore)
+                quizzes: quizCount
             },
             recentActivity: {
-                documents: recentDocuments,
-                quizzes: recentQuizzes
+                documents: recentDocs
             }
         });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-});
-
-router.get('/placeholder', authenticateToken, async (req, res) => {
-    try {
-        res.json({ message: 'Progress endpoint' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error fetching progress:', error);
+        // Return zero values on error to prevent frontend crash
+        res.json({
+            stats: { documents: 0, flashcards: 0, quizzes: 0 },
+            recentActivity: { documents: [] }
+        });
     }
 });
 

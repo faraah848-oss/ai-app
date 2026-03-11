@@ -1,0 +1,11 @@
+🤖 AI service: Initializing local Transformers model (LaMini-Flan-T5-783M)...
+✅ Server is running on http://127.0.0.1:5000
+✅ MongoDB connected successfully
+--- Registration Request Start ---
+Email: final-final-v1@example.com, Name: User OK
+Checking for existing user...
+--- Registration Error ---
+MongooseError: Operation `users.findOne()` buffering timed out after 10000ms
+    at Timeout._onTimeout (C:\Users\abdhu\OneDrive\Documents\learnix\frontend\node_modules\mongoose\lib\drivers\node-mongodb-native\collection.js:131:25)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)

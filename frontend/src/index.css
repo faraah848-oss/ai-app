@@ -39,4 +39,32 @@
     background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
     background-size: 16px 16px;
   }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  .cartoon-card {
+    @apply border-4 border-slate-900 rounded-[2.5rem] shadow-[12px_12px_0px_0px_rgba(15,23,42,1)] transition-all duration-300 bg-white;
+  }
+
+  .cartoon-card:hover {
+    @apply shadow-[16px_16px_0px_0px_rgba(15,23,42,1)] -translate-x-1 -translate-y-1;
+  }
+
+  .cartoon-btn {
+    @apply border-2 border-slate-900 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all active:shadow-none active:translate-x-1 active:translate-y-1;
+  }
 }
